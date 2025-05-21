@@ -16,34 +16,10 @@ export default function App() {
   });
 
   const [errors, setErrors] = useState({});
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isLoadingPincode, setIsLoadingPincode] = useState(false);
+  const [submitted, setsubmitted] = useState(false);
+  const [loadingPin, setloadingPin] = useState(false);
 
-  
-  const pincodeData = {
-    "110001": { city: "New Delhi", state: "Delhi" },
-    "400001": { city: "Mumbai", state: "Maharashtra" },
-    "700001": { city: "Kolkata", state: "West Bengal" },
-    "600001": { city: "Chennai", state: "Tamil Nadu" },
-    "500001": { city: "Hyderabad", state: "Telangana" },
-    "560001": { city: "Bangalore", state: "Karnataka" },
-    "380001": { city: "Ahmedabad", state: "Gujarat" },
-    "226001": { city: "Lucknow", state: "Uttar Pradesh" },
-    "800001": { city: "Patna", state: "Bihar" },
-    "302001": { city: "Jaipur", state: "Rajasthan" },
-    "284001": { city: "Jhansi", state: "Uttar Pradesh" },
-    "440001": { city: "Nagpur", state: "Maharashtra" },
-    "208001": { city: "Kanpur", state: "Uttar Pradesh" },
-    "641001": { city: "Coimbatore", state: "Tamil Nadu" },
-    "482001": { city: "Jabalpur", state: "Madhya Pradesh" },
-    "160001": { city: "Chandigarh", state: "Chandigarh" },
-    "781001": { city: "Guwahati", state: "Assam" },
-    "248001": { city: "Dehradun", state: "Uttarakhand" },
-    "695001": { city: "Thiruvananthapuram", state: "Kerala" },
-    "462001": { city: "Bhopal", state: "Madhya Pradesh" }
-  };
-
-  const stateOptions = [
+  const stateoptions = [
     { value: "", label: "Select State", isDisabled: true },
     { value: "Andhra Pradesh", label: "Andhra Pradesh" },
     { value: "Arunachal Pradesh", label: "Arunachal Pradesh" },
@@ -83,99 +59,108 @@ export default function App() {
     { value: "Puducherry", label: "Puducherry" },
   ];
 
-  // Function to fetch address details based on pincode
-  const fetchAddressFromPincode = (pincode) => {
-    if (pincode.length === 6) {
-      setIsLoadingPincode(true);
+  const fetchPincodeDetails = async (pincode) => {
+  if (pincode.length !== 6) return;
+  
+  setloadingPin(true);
+  
+  try {
+    const resp = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+    const data = await resp.json();
+    
+    if (data?.[0]?.Status === "Success" && data[0]?.PostOffice?.length) {
+      const postOffice = data[0].PostOffice[0];
       
+      setFormData(prev => ({
+        ...prev,
+        city: postOffice.District,
+        state: postOffice.State
+      }));
       
-      setTimeout(() => {
-        const data = pincodeData[pincode];
-        
-        if (data) {
-          setFormData(prev => ({
-            ...prev,
-            city: data.city,
-            state: data.state
-          }));
-          
-          
-          if (errors.city || errors.state) {
-            setErrors(prev => ({
-              ...prev,
-              city: null,
-              state: null
-            }));
-          }
-        }
-        
-        setIsLoadingPincode(false);
-      }, 600);
+      if (errors.city || errors.state) {
+        setErrors(prev => ({
+          ...prev,
+          city: null,
+          state: null
+        }));
+      }
+    } else {
+      setErrors(prev => ({
+        ...prev,
+        pincode: "Invalid pincode or no data available"
+      }));
     }
-  };
+  } catch (err) {
+    console.error("Error fetching pincode data:", err);
+    setErrors(prev => ({
+      ...prev,
+      pincode: "Error fetching pincode data. Please try again."
+    }));
+  } finally {
+    setloadingPin(false);
+  }
+};
 
-  const validate = () => {
-    const newErrors = {};
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^\d{10}$/;
-    const pincodeRegex = /^\d{6}$/;
+const validate = () => {
+  const newErrors = {};
+  
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;       ///aahhaahah
+  const phoneRegex = /^\d{10}$/;
+  const pincodeRegex = /^\d{6}$/;
 
-    if (!formData.firstName.trim()) newErrors.firstName = "First name is required";
-    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
+  if (!formData.firstName.trim()) newErrors.firstName = "First name is required";
+  if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
 
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Enter a valid email address";
-    }
+  if (!formData.email.trim()) {
+    newErrors.email = "Email is required";
+  } else if (!emailRegex.test(formData.email)) {
+    newErrors.email = "Enter a valid email address";
+  }
 
-    if (!formData.phone.trim()) {
-      newErrors.phone = "Phone number is required";
-    } else if (!phoneRegex.test(formData.phone)) {
-      newErrors.phone = "Enter a valid 10-digit phone number";
-    }
+  if (!formData.phone.trim()) {
+    newErrors.phone = "Phone number is required";
+  } else if (!phoneRegex.test(formData.phone)) {
+    newErrors.phone = "Enter a valid 10-digit phone number";
+  }
 
-    if (!formData.house.trim()) {
-      newErrors.house = "House number is required";
-    } else if (formData.house.length > 40) {
-      newErrors.house = "House number must not exceed 40 characters";
-    }
+  if (!formData.house.trim()) {
+    newErrors.house = "House number is required";
+  } else if (formData.house.length > 40) {
+    newErrors.house = "House number must not exceed 40 characters";
+  }
 
-    if (!formData.street.trim()) {
-      newErrors.street = "Street area is required";
-    } else if (formData.street.length > 80) {
-      newErrors.street = "Street must not exceed 80 characters";
-    }
+  if (!formData.street.trim()) {
+    newErrors.street = "Street area is required";
+  } else if (formData.street.length > 80) {
+    newErrors.street = "Street must not exceed 80 characters";
+  }
 
-    if (!formData.city.trim()) newErrors.city = "City is required";
+  if (!formData.city.trim()) newErrors.city = "City is required";
 
-    if (!formData.pincode.trim()) {
-      newErrors.pincode = "Pincode is required";
-    } else if (!pincodeRegex.test(formData.pincode)) {
-      newErrors.pincode = "Pincode must be 6 digits";
-    }
+  if (!formData.pincode.trim()) {
+    newErrors.pincode = "Pincode is required";
+  } else if (!pincodeRegex.test(formData.pincode)) {
+    newErrors.pincode = "Pincode must be 6 digits";
+  }
 
-    if (!formData.state || formData.state === "Select State") {
-      newErrors.state = "Please select a state";
-    }
+  if (!formData.state || formData.state === "Select State") {
+    newErrors.state = "Please select a state";
+  }
 
-    return newErrors;
-  };
+  return newErrors;
+};
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     
-    
     if (errors[name]) {
-      setErrors({ ...errors, [name]: null });
+         setErrors({ ...errors, [name]: null });
     }
     
-    
     if (name === "pincode") {
-      
       if (value.length === 6 && /^\d{6}$/.test(value)) {
-        fetchAddressFromPincode(value);
+        fetchPincodeDetails(value);
       }
     }
   };
@@ -184,8 +169,8 @@ export default function App() {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length === 0) {
-      setIsSubmitted(true);
-      setTimeout(() => setIsSubmitted(false), 3000);
+      setsubmitted(true);
+      setTimeout(() => setsubmitted(false), 3000);
     } else {
       setErrors(validationErrors);
     }
@@ -194,13 +179,13 @@ export default function App() {
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg overflow-hidden">
-        {/* Header */}
+        
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
           <h1 className="text-3xl font-bold">User Details</h1>
           <p className="text-blue-100 mt-2">Please fill in your information below</p>
         </div>
         
-        {isSubmitted ? (
+        {submitted ? (
           <div className="p-8 flex flex-col items-center justify-center">
             <div className="bg-green-100 rounded-full p-4 mb-4">
               <Check size={48} className="text-green-600" />
@@ -211,14 +196,15 @@ export default function App() {
         ) : (
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             <div className="space-y-6">
-              {/* Personal Information Section */}
+              
+              
               <div>
                 <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
                   <User className="mr-2 text-blue-600" size={20} />
                   Personal Information
                 </h2>
                 <div className="space-y-4">
-                  {/* First & Last Name */}
+                  
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">First & Middle Name</label>
@@ -244,16 +230,16 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Contact Information */}
+                  
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Email */}
+                    
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                         <Mail className="mr-1 text-blue-600" size={16} /> Email Address
                       </label>
                       <input
                         name="email"
-                        value={formData.email}
+                          value={formData.email}
                         onChange={handleChange}
                         placeholder="e.g. mayankdoholiya@gmail.com"
                         className={`w-full p-3 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
@@ -261,17 +247,17 @@ export default function App() {
                       {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
                     </div>
 
-                    {/* Phone */}
+                    
                     <div>
                       <label className="flex text-sm font-medium text-gray-700 mb-1 flex items-center">
                         <Phone className="mr-1 text-blue-600" size={16} /> Phone Number
                       </label>
                       <input
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        placeholder="10-digit mobile number"
-                        className={`w-full p-3 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
+                         name="phone"
+                         value={formData.phone}
+                           onChange={handleChange}
+                           placeholder="10-digit mobile number"
+                           className={`w-full p-3 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
                       />
                       {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
                     </div>
@@ -279,7 +265,7 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Address Section */}
+              
               <div>
                 <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
                   <Home className="mr-2 text-blue-600" size={20} />
@@ -288,7 +274,7 @@ export default function App() {
                 
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* House */}
+                    
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">House No. / Building</label>
                       <input
@@ -302,23 +288,23 @@ export default function App() {
                       {errors.house && <p className="text-red-500 text-sm mt-1">{errors.house}</p>}
                     </div>
 
-                    {/* Street */}
-                    <div>
+                    
+                <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Street / Area</label>
                       <input
                         name="street"
                         value={formData.street}
                         onChange={handleChange}
                         maxLength={80}
-                        placeholder="e.g. MG Road"
-                        className={`w-full p-3 border ${errors.street ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
+                        placeholder="e.g. Tilak nagar"
+                        className={`w-full p-3 border ${errors.street ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2  focus:border-blue-500 transition duration-200`}
                       />
                       {errors.street && <p className="text-red-500 text-sm mt-1">{errors.street}</p>}
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Pincode */}
+                    
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
                       <div className="relative">
@@ -329,7 +315,7 @@ export default function App() {
                           placeholder="6-digit PIN"
                           className={`w-full p-3 border ${errors.pincode ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
                         />
-                        {isLoadingPincode && (
+                        {loadingPin && (
                           <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
                           </div>
@@ -338,7 +324,7 @@ export default function App() {
                       {errors.pincode && <p className="text-red-500 text-sm mt-1">{errors.pincode}</p>}
                     </div>
                     
-                    {/* City */}
+                    
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                         <MapPin className="mr-1 text-blue-600" size={16} /> City
@@ -348,19 +334,19 @@ export default function App() {
                         value={formData.city}
                         onChange={handleChange}
                         placeholder="e.g. Jhansi"
-                        readOnly={isLoadingPincode}
+                        readOnly={loadingPin}
                         className={`w-full p-3 border ${errors.city ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ${formData.pincode.length === 6 ? 'bg-gray-50' : ''}`}
                       />
                       {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
                     </div>
                   </div>
 
-                  {/* State Dropdown */}
+                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
                     <Select
-                      options={stateOptions}
-                      value={stateOptions.find((option) => option.value === formData.state)}
+                      options={stateoptions}
+                      value={stateoptions.find((option) => option.value === formData.state)}
                       onChange={(selectedOption) => {
                         setFormData({ ...formData, state: selectedOption.value });
                         if (errors.state) {
@@ -368,7 +354,7 @@ export default function App() {
                         }
                       }}
                       placeholder="Select your state"
-                      isDisabled={isLoadingPincode}
+                      isDisabled={loadingPin}
                       className={errors.state ? "border-red-500 rounded-lg" : ""}
                       styles={{
                         control: (base, state) => ({
@@ -451,7 +437,7 @@ export default function App() {
               </div>
             </div>
 
-            {/* Submit Button */}
+            
             <div className="pt-4">
               <button
                 type="submit"
