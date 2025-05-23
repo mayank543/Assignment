@@ -198,72 +198,72 @@ const validate = () => {
             <div className="space-y-6">
               
               
+        <div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+            <User className="mr-2 text-blue-600" size={20} />
+            Personal Information
+          </h2>
+          <div className="space-y-4">
+            
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-                  <User className="mr-2 text-blue-600" size={20} />
-                  Personal Information
-                </h2>
-                <div className="space-y-4">
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">First & Middle Name</label>
-                      <input
-                        name="firstName"
-                        value={formData.firstName}
-                        onChange={handleChange}
-                        placeholder="e.g. Mayank Kumar"
-                        className={`w-full p-3 border ${errors.firstName ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
-                      />
-                      {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                      <input
-                        name="lastName"
-                        value={formData.lastName}
-                        onChange={handleChange}
-                        placeholder="e.g. Doholiya"
-                        className={`w-full p-3 border ${errors.lastName ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
-                      />
-                      {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
-                    </div>
-                  </div>
-
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-                        <Mail className="mr-1 text-blue-600" size={16} /> Email Address
-                      </label>
-                      <input
-                        name="email"
-                          value={formData.email}
-                        onChange={handleChange}
-                        placeholder="e.g. mayankdoholiya@gmail.com"
-                        className={`w-full p-3 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
-                      />
-                      {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-                    </div>
-
-                    
-                    <div>
-                      <label className="flex text-sm font-medium text-gray-700 mb-1 flex items-center">
-                        <Phone className="mr-1 text-blue-600" size={16} /> Phone Number
-                      </label>
-                      <input
-                         name="phone"
-                         value={formData.phone}
-                           onChange={handleChange}
-                           placeholder="10-digit mobile number"
-                           className={`w-full p-3 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
-                      />
-                      {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
-                    </div>
-                  </div>
-                </div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">First & Middle Name</label>
+                <input
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  placeholder="e.g. Mayank Kumar"
+                  className={`w-full p-3 border ${errors.firstName ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
+                />
+                {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                <input
+                  name="lastName"
+                   value={formData.lastName}
+                  onChange={handleChange}
+                  placeholder="e.g. Doholiya"
+                  className={`w-full p-3 border ${errors.lastName ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
+                />
+            {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
+              </div>
+            </div>
+
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                  <Mail className="mr-1 text-blue-600" size={16} /> Email Address
+                </label>
+                <input
+                  name="email"
+                    value={formData.email}
+                  onChange={handleChange}
+                  placeholder="e.g. mayankdoholiya@gmail.com"
+                  className={`w-full p-3 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
+                />
+                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+              </div>
+
+              
+              <div>
+                <label className="flex text-sm font-medium text-gray-700 mb-1 flex items-center">
+                  <Phone className="mr-1 text-blue-600" size={16} /> Phone Number
+                </label>
+                <input
+                    name="phone"
+                    value={formData.phone}
+                      onChange={handleChange}
+                      placeholder="10-digit mobile number"
+                      className={`w-full p-3 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
+                />
+                {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
+              </div>
+            </div>
+          </div>
+        </div>
 
               
               <div>
