@@ -14,6 +14,7 @@ export default function App() {
     pincode: "",
     state: "",
   });
+  
 
   const [errors, setErrors] = useState({});
   const [submitted, setsubmitted] = useState(false);
